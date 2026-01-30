@@ -3,22 +3,27 @@ package com.cart.products.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.cart.products.models.Product;
 import com.cart.products.services.ProdDto;
 import com.cart.products.services.ProductService;
 
-
 @RestController
+
+@RequestMapping("/")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 	@Autowired
 	public ProductService prodService;
@@ -64,7 +69,10 @@ public class ProductController {
 	}
 	
 	@GetMapping("product")
-	public List<Product> searchProduct(@RequestParam(required = true) String search, @RequestParam(required = true) String filterStr, @RequestParam(required = true) String sortByStr){
+	public Page<Product> searchProduct(@RequestParam(required = true) String search, @RequestParam(required = true) String filterStr, 
+			@RequestParam(required = true) String sortByStr, @RequestParam(required = false)  String pageNumber, @RequestParam(required = false) String pageSize){
+		int pageNu = (pageNumber == "1" || "0".equals(pageNumber)) ? 0 : Integer.parseInt(pageNumber)-1;
+		int pageLimit = (pageSize == null || "null".equals(pageSize)) ? 10 : Integer.parseInt(pageSize);
 		Double filter = (filterStr == null || "null".equals(filterStr)) ? 0.0 : Double.parseDouble(filterStr);
 		Sort sortBy;
 		if(sortByStr.equalsIgnoreCase("des")) {
@@ -73,6 +81,6 @@ public class ProductController {
 		else sortBy = Sort.by("price").ascending();
 		search = (search.equalsIgnoreCase("null")) ? "" : search;
 		System.out.println(search + filter + sortBy);
-		return prodService.searchProd(search, filter, sortBy);
+		return prodService.searchProd(search, filter, sortBy, pageNu, pageLimit);
 	}
 }

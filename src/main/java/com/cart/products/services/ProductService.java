@@ -2,6 +2,9 @@ package com.cart.products.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -60,9 +63,10 @@ public class ProductService {
 		}
 	}
 
-	public List<Product> searchProd(String productnameId, Double filter, Sort sortBy) {
-		
-		return repo.searchProducts(productnameId, filter, sortBy);
+	public Page<Product> searchProd(String productnameId, Double filter, Sort sortBy, int pageNu, int pageLimit) {
+		Pageable pageable = PageRequest.of(pageNu, pageLimit, sortBy);
+
+		return repo.searchProducts(productnameId, filter, pageable);
 	}
 
 //	public List<Product> filterProducts(String keyword) {
